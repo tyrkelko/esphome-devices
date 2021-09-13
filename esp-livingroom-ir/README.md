@@ -35,4 +35,10 @@ esphome
 
 The component for homeassistant eventually looks like the above.
 
+And here are the device pictures and schematics:
+
 ![esp-livingroom-ir-diy-nodemcu-v3-with-pir-wires-and-sensor](https://user-images.githubusercontent.com/6322663/133160905-4502fbc5-b649-496f-ae27-4e0811ec07dd.jpg)
+
+![esp-livingroom-ir-diy-shield-top](https://user-images.githubusercontent.com/6322663/133161081-a7b2683c-f09d-4100-b19d-96729a855903.jpg)
+
+![esp-livingroom-ir_bb](https://user-images.githubusercontent.com/6322663/133161106-943fe0fa-4c82-4e44-a22b-af9c47a95dfb.png)
