@@ -34,3 +34,5 @@ esphome
 <img width="246" alt="esp-livingroom-ir-lovelace-ui" src="https://user-images.githubusercontent.com/6322663/133160703-68ff88fe-bc8c-4690-b329-9acf1fb97563.png">
 
 The component for homeassistant eventually looks like the above.
+
+![esp-livingroom-ir-diy-nodemcu-v3-with-pir-wires-and-sensor](https://user-images.githubusercontent.com/6322663/133160905-4502fbc5-b649-496f-ae27-4e0811ec07dd.jpg)
