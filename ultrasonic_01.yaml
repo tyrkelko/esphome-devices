@@ -1,0 +1,48 @@
+esphome:
+  name: ultrasonic-01
+  platform: ESP8266
+  board: esp01_1m
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  manual_ip:
+    static_ip: 10.100.102.53
+    gateway: 10.100.102.1
+    subnet: 255.255.255.0
+    
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Ultrasonic-01-Hotspot"
+    password: !secret ultrasonic-01-ap-password
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+
+# Define sensor
+sensor:
+  - platform: ultrasonic
+    trigger_pin: GPIO4
+    echo_pin: GPIO2
+    name: "Ultrasonic Sensor"
+
+binary_sensor:
+  - platform: gpio
+    pin: GPIO3
+    name: "Motion on music corner"
+    device_class: motion
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "Music corner light switch"
+    filters:
+      - delayed_on: 10ms

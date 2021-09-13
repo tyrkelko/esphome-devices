@@ -1,0 +1,118 @@
+esphome:
+  name: esp-bedroom-clock
+  platform: ESP8266
+  board: esp01_1m
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+  password: !secret bedroom-clock-ota-password
+
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  manual_ip:
+    static_ip: 10.100.102.50
+    gateway: 10.100.102.1
+    subnet: 255.255.255.0
+  reboot_timeout: 120s
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "esp-bedroom-clock"
+    password: !secret bedroom-clock-ap-password
+
+
+captive_portal:
+
+
+i2c:
+  sda: GPIO2
+  scl: GPIO0
+  scan: True
+
+sensor:
+  - platform: bme280
+    temperature:
+      name: "Temperature Bedroom Clock"
+      oversampling: 16x
+      id: temperature_bedroom_clock
+    pressure:
+      name: "Pressure bedroom_clock"
+      id: preasure_bedroom_clock
+    humidity:
+      name: "Humidity Bedroom Clock"
+      id: humidity_bedroom_clock
+    address: 0x76
+    update_interval: 60s
+
+time:
+  - platform: homeassistant
+    id: esptime
+
+font:
+  - file: 'arial.ttf'
+    id: font1
+    size: 48
+  - file: 'arial.ttf'
+    id: font2
+    size: 14
+  - file: 'arial.ttf'
+    id: font3
+    size: 18
+
+animation:
+  - file: "images/ac_cool.gif"
+    id: ac_cool
+  - file: "images/ac_auto.gif"
+    id: ac_auto
+  - file: "images/ac_dry.gif"
+    id: ac_dry
+  - file: "images/ac_fan.gif"
+    id: ac_fan
+  - file: "images/ac_heat.gif"
+    id: ac_heat
+  - file: "images/ac_heat_up.gif"
+    id: ac_heat_up
+  - file: "images/ac_cool_down.gif"
+    id: ac_cool_down
+image:
+  - file: "images/ac_off.bmp"
+    id: ac_off
+
+display:
+  - platform: ssd1306_i2c
+    model: "SSD1306 128x64"
+    address: 0x3C
+
+    lambda: |- 
+      static int current_temperature;
+      static int previous_temperature;
+      static int animation_temperature_up = 0;
+      static int animation_temperature_down = 0;
+      current_temperature = round(id(temperature_bedroom_clock).state);
+      if (current_temperature > previous_temperature) animation_temperature_up = 1;
+      if (current_temperature < previous_temperature) animation_temperature_down = 1;
+      // ESP_LOGD("main", "\ncurrent_temperature: %d\nprevious temperature: %d\nanimation_temperature_up: %d\nanimation_temperature_down: %d\n", current_temperature, previous_temperature, animation_temperature_up, animation_temperature_down);
+      // Print inside temperature (from homeassistant sensor)
+      if (animation_temperature_up > 0) {
+        it.image(64, 0, id(ac_heat_up));
+        id(ac_heat_up).next_frame();
+        animation_temperature_up++;
+        animation_temperature_up = animation_temperature_up % 9;
+      } else if (animation_temperature_down > 0) {
+        it.image(64, 0, id(ac_cool_down));
+        id(ac_cool_down).next_frame();
+        animation_temperature_down++;
+        animation_temperature_down = animation_temperature_down % 9;
+      } else if (id(temperature_bedroom_clock).has_state()) {
+        it.printf(76, 18, id(font3), TextAlign::BASELINE_LEFT , "%.0f°C", id(temperature_bedroom_clock).state);
+      }
+      // Print time
+      it.strftime(0, 60, id(font1), TextAlign::BASELINE_LEFT, "%H:%M", id(esptime).now());
+      previous_temperature = current_temperature;
